@@ -9,16 +9,16 @@ import { AuthsController } from './auths.controller';
 import { AuthGuard } from '../../guards/auth.guards';
 import { GoogleStrategy } from './strategies/google.strategy';
 import google0authConfig from 'src/config/google-0auth.config';
-import { MailModule } from '../mail/mail.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from '../users/Entyties/users.entity';
+import { Employee } from '../employee/entities/employee.entity';
+import { Role } from '../roles/entities/role.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, Employee, Role]),
     forwardRef(() => UsersModule),
     PassportModule,
-    MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

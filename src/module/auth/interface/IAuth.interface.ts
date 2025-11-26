@@ -3,7 +3,15 @@ export interface IUserAuthResponse {
   name: string;
   email: string;
   birthdate: Date;
-  address: string;
+  phone: string;
+  username: string;
+  password?: string;
+}
+
+export interface IEmployeeAuthResponse {
+  id: string;
+  name: string;
+  email: string;
   phone: string;
   username: string;
   password?: string;
@@ -17,9 +25,9 @@ export interface AuthResponse {
     name: string;
     email: string;
     birthdate?: Date;
-    address: string;
     username?: string;
     phone?: string;
+    role: string;
   };
 }
 

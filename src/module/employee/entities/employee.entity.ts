@@ -31,9 +31,6 @@ export class Employee {
   @Column({ type: 'varchar', length: 50, unique: true, nullable: false })
   email: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true, nullable: false })
-  username: string;
-
   @Column('text', { nullable: true })
   address: string;
 

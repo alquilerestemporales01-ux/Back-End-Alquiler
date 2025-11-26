@@ -1,4 +1,4 @@
-Simport { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateCleaningTaskDto } from './dto/create-cleaning_task.dto';
 import { UpdateCleaningTaskDto } from './dto/update-cleaning_task.dto';
 

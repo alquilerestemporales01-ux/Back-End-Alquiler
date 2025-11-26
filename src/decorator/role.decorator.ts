@@ -5,6 +5,7 @@ export enum UserRole {
   CLIENT = 'CLIENT',
   CLEANER = 'CLEANER',
   KEY_KEEPER = 'KEY_KEEPER',
+  SUPER_ADMIN = 'SUPER_ADMIN',
 }
 
 export const Roles = (...roles: UserRole[]): CustomDecorator<string> => SetMetadata('roles', roles);

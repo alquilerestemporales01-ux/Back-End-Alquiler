@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 import { RolesService } from './roles.service';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.rolesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
+  @Post('seed_roles')
+  @ApiOperation({
+    summary: 'Ejecutar seeds de roles',
+    description: 'Crea los 5 roles del sistema si no existen',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Seeds ejecutados exitosamente',
+    schema: {
+      example: {
+        message: 'Seeds ejecutados exitosamente',
+        roles: ['SUPER_ADMIN', 'ADMIN', 'CLIENT', 'CLEANER', 'KEY_KEEPER'],
+      },
+    },
+  })
+  @ApiBearerAuth()
+  async runSeeds(): Promise<{ message: string; roles: string[] }> {
+    return await this.rolesService.runSeeds();
   }
 }

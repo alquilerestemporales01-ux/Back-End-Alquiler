@@ -12,7 +12,6 @@ import {
   Req,
   Delete,
   Patch,
-  Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -28,10 +27,7 @@ import {
   ResponseUserWithAdminDto,
 } from './interface/IUserResponseDto';
 import { UpdatePasswordDto } from './Dtos/UpdatePasswordDto';
-import { UpdateRoleDto } from './Dtos/UpdateRoleDto';
 import { UpdateUserDbDto } from './Dtos/CreateUserDto';
-import { ForgotPasswordDto } from './Dtos/forgot-password.dto';
-import { ResetPasswordDto } from './Dtos/reset-password.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -85,17 +81,17 @@ export class UsersController {
     return ResponseUserDto.toDTO(await this.usersService.getUserById(id));
   }
 
-  @Patch('roles/:id') // Corregido el endpoint
-  @ApiOperation({ summary: 'Role change by ID' })
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.SUPER_ADMIN)
-  async rollChange(
-    @Param('id', ParseUUIDPipe) userId: string,
-    @Body() dto: UpdateRoleDto,
-  ): Promise<{ message: string }> {
-    await this.usersService.rollChange(userId, dto);
-    return { message: 'Los roles se actualizaron correctamente' };
-  }
+  // @Patch('roles/:id') // Corregido el endpoint
+  // @ApiOperation({ summary: 'Role change by ID' })
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(UserRole.SUPER_ADMIN)
+  // async rollChange(
+  //   @Param('id', ParseUUIDPipe) userId: string,
+  //   @Body() dto: UpdateRoleDto,
+  // ): Promise<{ message: string }> {
+  //   await this.usersService.rollChange(userId, dto);
+  //   return { message: 'Los roles se actualizaron correctamente' };
+  // }
 
   @Put('update/user')
   @ApiOperation({ summary: 'Update user information' })
@@ -147,29 +143,29 @@ export class UsersController {
     return ResponseUserDto.toDTO(user);
   }
 
-  @Post('forgot-password')
-  @ApiOperation({ summary: 'Request password recovery' })
-  @ApiBody({ type: ForgotPasswordDto })
-  @ApiResponse({
-    status: 200,
-    description: 'If the email exists, a reset link is sent.',
-  })
-  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
-    await this.usersService.sendResetPasswordEmail(dto.email);
-    return {
-      message: 'If the email exists, the password reset link has been sent.',
-    };
-  }
+  // @Post('forgot-password')
+  // @ApiOperation({ summary: 'Request password recovery' })
+  // @ApiBody({ type: ForgotPasswordDto })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'If the email exists, a reset link is sent.',
+  // })
+  // async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ message: string }> {
+  //   await this.usersService.sendResetPasswordEmail(dto.email);
+  //   return {
+  //     message: 'If the email exists, the password reset link has been sent.',
+  //   };
+  // }
 
-  @Post('reset-password')
-  @ApiOperation({ summary: 'Reset password using email token' })
-  @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Password reset successfully',
-  })
-  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
-    await this.usersService.resetPassword(dto);
-    return { message: 'Password reset successfully' };
-  }
+  // @Post('reset-password')
+  // @ApiOperation({ summary: 'Reset password using email token' })
+  // @ApiBody({ type: ResetPasswordDto })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Password reset successfully',
+  // })
+  // async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ message: string }> {
+  //   await this.usersService.resetPassword(dto);
+  //   return { message: 'Password reset successfully' };
+  // }
 }

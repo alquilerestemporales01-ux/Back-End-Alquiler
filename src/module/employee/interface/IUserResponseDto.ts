@@ -1,12 +1,11 @@
-import { Users } from '../Entyties/users.entity';
+import { Employee } from '../entities/employee.entity';
 
-export interface IUserResponseDto {
+export interface IEmployeeResponseDto {
   id: string;
   name: string;
   email: string;
-  birthdate: Date;
   phone: string;
-  username: string;
+  role: string;
   createdAt: Date;
   deletedAt: Date | null;
 }
@@ -19,38 +18,37 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
-export class ResponseUserDto {
-  static toDTO(user: Users): IUserResponseDto {
+export class ResponseEmployeeDto {
+  static toDTO(user: Employee): IEmployeeResponseDto {
     return {
       id: user.id,
       name: user.name,
       email: user.email,
-      birthdate: user.birthdate,
       phone: user.phone,
-      username: user.username,
+      role: user.role?.name || 'CLIENT',
       createdAt: user.createdAt ?? new Date(),
       deletedAt: user.deletedAt,
     };
   }
 
-  static toDTOList(users: Users[]): IUserResponseDto[] {
+  static toDTOList(users: Employee[]): IEmployeeResponseDto[] {
     return users.map((user) => this.toDTO(user));
   }
 }
 
-export interface IUserResponseWithAdmin extends IUserResponseDto {
+export interface IEmployeeResponseWithAdmin extends IEmployeeResponseDto {
   password: string;
 }
 
-export class ResponseUserWithAdminDto {
-  static toDTO(user: Users): IUserResponseWithAdmin {
+export class ResponseEmployeeWithAdminDto {
+  static toDTO(user: Employee): IEmployeeResponseWithAdmin {
     return {
-      ...ResponseUserDto.toDTO(user),
+      ...ResponseEmployeeDto.toDTO(user),
       password: user.password,
     };
   }
 
-  static toDTOList(users: Users[]): IUserResponseWithAdmin[] {
+  static toDTOList(users: Employee[]): IEmployeeResponseWithAdmin[] {
     return users.map((user) => this.toDTO(user));
   }
 }

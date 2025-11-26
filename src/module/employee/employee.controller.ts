@@ -1,34 +1,43 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { CreateEmployeeDto, UpdateEmployeeDto } from './dto/create-employee.dto';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ResponseEmployeeDto } from './interface/IUserResponseDto';
 
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
-  @Post()
-  create(@Body() createEmployeeDto: CreateEmployeeDto) {
-    return this.employeeService.create(createEmployeeDto);
+  @ApiOperation({ summary: 'Sign up new user' })
+  @ApiBody({ type: CreateEmployeeDto })
+  @Post('signup')
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  async signup(@Body() newEmployee: CreateEmployeeDto): Promise<ResponseEmployeeDto> {
+    return await this.employeeService.signup(newEmployee);
   }
 
   @Get()
-  findAll() {
-    return this.employeeService.findAll();
+  async findAll(): Promise<ResponseEmployeeDto[]> {
+    return await this.employeeService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.employeeService.findOne(+id);
+  findOne(@Param('id') id: string): ResponseEmployeeDto {
+    return this.employeeService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
-    return this.employeeService.update(+id, updateEmployeeDto);
+  update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto): ResponseEmployeeDto {
+    return this.employeeService.update(id, updateEmployeeDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.employeeService.remove(+id);
+  remove(@Param('id') id: string): Promise<{ message: string }> {
+    return this.employeeService.remove(id);
   }
 }

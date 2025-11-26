@@ -6,13 +6,40 @@ export async function seedRoles(dataSource: DataSource): Promise<void> {
 
   const roles = [
     {
+      name: 'SUPER_ADMIN',
+      description: 'Super Administrador con acceso total al sistema',
+      permissions: {
+        properties: ['create', 'read', 'update', 'delete'],
+        bookings: ['create', 'read', 'update', 'delete', 'cancel'],
+        users: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
+        employees: ['create', 'read', 'update', 'delete', 'activate', 'deactivate'],
+        roles: ['create', 'read', 'update', 'delete'],
+        reviews: ['create', 'read', 'update', 'delete', 'moderate'],
+        payments: ['create', 'read', 'update', 'delete', 'refund'],
+        notifications: ['create', 'read', 'update', 'delete', 'send'],
+        cleaningTasks: ['create', 'read', 'update', 'delete', 'assign', 'complete'],
+        keyHandoverTasks: ['create', 'read', 'update', 'delete', 'assign', 'complete'],
+        availability: ['create', 'read', 'update', 'delete'],
+        propertyImages: ['create', 'read', 'update', 'delete', 'upload'],
+        employeePropertyAssignments: ['create', 'read', 'update', 'delete'],
+        system: ['backup', 'restore', 'logs', 'settings', 'analytics'],
+      },
+    },
+    {
       name: 'ADMIN',
       description: 'Administrador del sistema',
       permissions: {
         properties: ['create', 'read', 'update', 'delete'],
-        bookings: ['create', 'read', 'update', 'delete'],
-        users: ['create', 'read', 'update', 'delete'],
-        employees: ['create', 'read', 'update', 'delete'],
+        propertyImages: ['create', 'read', 'update', 'delete', 'upload'],
+        availability: ['create', 'read', 'update', 'delete'],
+        bookings: ['create', 'read', 'update', 'delete', 'cancel'],
+        users: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
+        employees: ['create', 'read', 'update', 'delete', 'activate', 'deactivate'],
+        notifications: ['create', 'read', 'update', 'delete', 'send'],
+        cleaningTasks: ['create', 'read', 'update', 'delete', 'assign', 'complete'],
+        keyHandoverTasks: ['create', 'read', 'update', 'delete', 'assign', 'complete'],
+        employeePropertyAssignments: ['create', 'read', 'update', 'delete'],
+        reviews: ['create', 'read', 'update', 'delete', 'moderate'],
       },
     },
     {

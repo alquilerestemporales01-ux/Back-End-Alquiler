@@ -33,7 +33,7 @@ export class CreateUserDto {
   })
   @IsOptional()
   @IsNumber()
-  phone: number;
+  phone: string;
 
   @ApiProperty({
     description: 'Dirección completa',

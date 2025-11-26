@@ -2,11 +2,13 @@ import { Booking } from 'src/module/booking/entities/booking.entity';
 import { Notification } from 'src/module/notification/entities/notification.entity';
 import { Payment } from 'src/module/payments/entities/payment.entity';
 import { Review } from 'src/module/review/entities/review.entity';
+import { Role } from 'src/module/roles/entities/role.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -60,4 +62,7 @@ export class Users {
 
   @OneToMany(() => Payment, (payment) => payment.user)
   payments: Payment[];
+
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role;
 }

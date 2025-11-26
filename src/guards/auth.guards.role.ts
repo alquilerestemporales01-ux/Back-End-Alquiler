@@ -27,8 +27,7 @@ export class RoleGuard extends AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthRequest>();
     const user = request.user;
 
-    // 4. ✅ VERIFICAR ROL DESDE EL JWT
-    const hasRequiredRole = roles.some((role) => user.role === role);
+    const hasRequiredRole = roles.some((role) => user.role === role.toString());
 
     // 5. Si no tiene el rol, rechazar
     if (!hasRequiredRole) {

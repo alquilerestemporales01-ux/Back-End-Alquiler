@@ -1,5 +1,5 @@
 // src/modules/auths/auths.service.ts
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,7 +8,7 @@ import { Users } from '../users/Entyties/users.entity';
 import { AuthValidations } from './validate/auth.validate';
 import { Employee } from '../employee/entities/employee.entity';
 import { Role } from '../roles/entities/role.entity';
-import { AuthResponse } from './interface/IAuth.interface';
+import { AuthResponse, GoogleUser } from './interface/IAuth.interface';
 import { CreateUserDto } from '../users/Dtos/CreateUserDto';
 import { ResponseUserDto } from '../users/interface/IUserResponseDto';
 
@@ -26,16 +26,12 @@ export class AuthsService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // ============================================
-  // LOGIN DE USUARIO (Cliente)
-  // ============================================
   async signin(email: string, password: string): Promise<AuthResponse> {
     AuthValidations.validateCredentials(email, password);
 
-    // Buscar usuario CON su rol
     const user = await this.usersRepository.findOne({
       where: { email },
-      relations: ['role'], // ⚠️ IMPORTANTE: cargar relación
+      relations: ['role'],
     });
 
     if (!user) {
@@ -50,15 +46,12 @@ export class AuthsService {
     return this.generateAuthResponse(user, 'user');
   }
 
-  // ============================================
-  // LOGIN DE EMPLEADO (Admin, Cleaner, KeyKeeper)
-  // ============================================
   async signinEmployee(email: string, password: string): Promise<AuthResponse> {
     AuthValidations.validateCredentials(email, password);
 
     const employee = await this.employeeRepository.findOne({
       where: { email },
-      relations: ['role'], // ⚠️ IMPORTANTE
+      relations: ['role'],
     });
 
     if (!employee) {
@@ -72,21 +65,16 @@ export class AuthsService {
     return this.generateAuthResponse(employee, 'employee');
   }
 
-  // ============================================
-  // REGISTRO DE USUARIO
-  // ============================================
   async signup(data: CreateUserDto): Promise<ResponseUserDto> {
     const { password, confirmPassword, ...userData } = data;
 
     AuthValidations.validatePasswordMatch(password, confirmPassword);
 
-    // Verificar email existente
     const existingEmailUser = await this.usersRepository.findOne({
       where: { email: userData.email },
     });
     AuthValidations.validateEmailIsNotTaken(existingEmailUser?.email);
 
-    // Verificar username existente
     const existingUsernameUser = await this.usersRepository.findOne({
       where: { username: userData.username },
     });
@@ -95,7 +83,6 @@ export class AuthsService {
     }
 
     try {
-      // Buscar o crear rol CLIENT
       let clientRole = await this.roleRepository.findOne({
         where: { name: 'CLIENT' },
       });
@@ -113,11 +100,10 @@ export class AuthsService {
 
       const hashedPassword = await AuthValidations.hashPassword(password);
 
-      // Crear usuario con rol CLIENT
       const newUser = this.usersRepository.create({
         ...userData,
         password: hashedPassword,
-        role: clientRole, // ✅ Asignar rol
+        role: clientRole,
       });
 
       const savedUser = await this.usersRepository.save(newUser);
@@ -130,9 +116,6 @@ export class AuthsService {
     }
   }
 
-  // ============================================
-  // GOOGLE LOGIN
-  // ============================================
   async googleLogin(googleUser: GoogleUser): Promise<AuthResponse> {
     this.validateGoogleUser(googleUser);
 
@@ -160,9 +143,6 @@ export class AuthsService {
     return this.generateAuthResponse(authenticatedUser, 'user');
   }
 
-  // ============================================
-  // CREAR USUARIO DESDE GOOGLE
-  // ============================================
   private async createUserFromGoogleProfile(googleUser: GoogleUser): Promise<Users> {
     const randomPassword = await AuthValidations.generateRandomPassword();
     const username = AuthValidations.generateUsernameFromEmail(googleUser.email);
@@ -186,11 +166,10 @@ export class AuthsService {
     const createdUser = this.usersRepository.create({
       name: googleUser.name,
       email: googleUser.email,
-      birthdate: new Date().toISOString().split('T')[0] as any,
+      birthdate: new Date().toISOString().split('T')[0],
       username,
       password: randomPassword,
-      phone: 0,
-      address: 'Sin dirección',
+      phone: '+10000000000',
       role: clientRole, // ✅ Asignar rol
     });
 
@@ -230,12 +209,9 @@ export class AuthsService {
         name: entity.name,
         email: entity.email,
         role: entity.role?.name || 'CLIENT',
-        ...(type === 'user' && {
-          birthdate: (entity as Users).birthdate,
-          address: (entity as Users).address,
-          username: (entity as Users).username,
-          phone: (entity as Users).phone,
-        }),
+        username: type === 'user' ? (entity as Users).username : undefined,
+        phone: entity.phone,
+        birthdate: type === 'user' ? (entity as Users).birthdate : undefined,
       },
     };
   }

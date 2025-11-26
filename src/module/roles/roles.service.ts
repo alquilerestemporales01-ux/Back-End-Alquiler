@@ -1,26 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from './entities/role.entity';
+import { DataSource, Repository } from 'typeorm';
+import { seedRoles } from 'src/seeds/role.seed';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
-  }
+  private readonly logger = new Logger(RolesService.name);
 
-  findAll() {
-    return `This action returns all roles`;
-  }
+  constructor(
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
+    private readonly dataSource: DataSource,
+  ) {}
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
-  }
+  async runSeeds(): Promise<{ message: string; roles: string[] }> {
+    this.logger.log('🌱 Ejecutando seeds de roles...');
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
-  }
+    try {
+      await seedRoles(this.dataSource);
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+      // Obtener todos los roles creados
+      const roles = await this.roleRepository.find({
+        select: ['name', 'description'],
+      });
+
+      this.logger.log('✅ Seeds ejecutados correctamente');
+
+      return {
+        message: 'Seeds ejecutados exitosamente',
+        roles: roles.map((r) => r.name),
+      };
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : typeof error === 'string' ? error : JSON.stringify(error);
+
+      this.logger.error(`❌ Error al ejecutar seeds: ${message}`);
+      throw new Error(`Error al ejecutar seeds: ${message}`);
+    }
   }
 }

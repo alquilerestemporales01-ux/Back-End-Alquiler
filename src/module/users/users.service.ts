@@ -15,9 +15,6 @@ import { UpdatePasswordDto } from './Dtos/UpdatePasswordDto';
 import { AuthValidations } from '../auth/validate/auth.validate';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { MailService } from '../mail/mail.service';
-import { UpdateRoleDto } from './Dtos/UpdateRoleDto';
-import { ResetPasswordDto } from './Dtos/reset-password.dto';
 import { IPaginatedResult } from './interface/IPaginatedResult';
 
 @Injectable()
@@ -28,7 +25,6 @@ export class UsersService {
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
     private readonly configService: ConfigService,
-    private readonly mailService: MailService,
   ) {}
 
   async getUsers(searchQuery: UserSearchQueryDto): Promise<IPaginatedResult<Users>> {
@@ -38,19 +34,7 @@ export class UsersService {
       return await paginate(this.usersRepository, pagination, {
         order: { createdAt: 'DESC' },
         withDeleted: true,
-        select: [
-          'id',
-          'name',
-          'email',
-          'birthdate',
-          'phone',
-          'address',
-          'username',
-          'isAdmin',
-          'isSuperAdmin',
-          'createdAt',
-          'deletedAt',
-        ],
+        select: ['id', 'name', 'email', 'birthdate', 'phone', 'address', 'username', 'createdAt', 'deletedAt'],
       });
     }
 
@@ -64,8 +48,6 @@ export class UsersService {
       'user.phone',
       'user.address',
       'user.username',
-      'user.isAdmin',
-      'user.isSuperAdmin',
       'user.createdAt',
       'user.deletedAt',
     ]);
@@ -126,8 +108,6 @@ export class UsersService {
         'phone',
         'address',
         'username',
-        'isAdmin',
-        'isSuperAdmin',
         'createdAt',
         'deletedAt',
       ],
@@ -188,12 +168,6 @@ export class UsersService {
       );
     }
 
-    this.mailService.sendUserDataChangedNotification(updatedUser.email, updatedUser.name).catch((err: unknown) => {
-      const message = err instanceof Error ? err.message : 'Error desconocido al enviar email de modificación de datos';
-      const stack = err instanceof Error ? err.stack : undefined;
-      this.logger.error(message, stack);
-    });
-
     return updatedUser;
   }
 
@@ -218,29 +192,6 @@ export class UsersService {
 
     user.password = hashedPassword;
     await this.usersRepository.save(user);
-
-    this.mailService.sendPasswordChangedConfirmationEmail(user.email, user.name).catch((err: unknown) => {
-      const message = err instanceof Error ? err.message : 'Error sending email';
-      const stack = err instanceof Error ? err.stack : undefined;
-      this.logger.error(message, stack);
-    });
-  }
-
-  async rollChange(userId: string, dto: UpdateRoleDto): Promise<void> {
-    try {
-      const user = await this.usersRepository.findOne({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        throw new NotFoundException(`Usuario con id ${userId} no encontrado`);
-      }
-
-      await this.usersRepository.update(user.id, dto);
-    } catch (error) {
-      this.logger.error('Error changing user role:', error);
-      throw new InternalServerErrorException('Error changing user role');
-    }
   }
 
   async deleteUser(id: string): Promise<{ message: string }> {
@@ -256,8 +207,6 @@ export class UsersService {
       if (!result.affected) {
         throw new NotFoundException(`User: ${id} not found`);
       }
-
-      await this.mailService.sendAccountDeletedNotification(user.email, user.name);
 
       return { message: `User ${id} successfully removed.` };
     } catch (error) {
@@ -303,37 +252,37 @@ export class UsersService {
     }
   }
 
-  async sendResetPasswordEmail(email: string): Promise<void> {
-    const user = await this.usersRepository.findOne({ where: { email } });
-    if (!user) {
-      throw new BadRequestException('Credenciales inválidas');
-    }
+  // async sendResetPasswordEmail(email: string): Promise<void> {
+  //   const user = await this.usersRepository.findOne({ where: { email } });
+  //   if (!user) {
+  //     throw new BadRequestException('Credenciales inválidas');
+  //   }
 
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
-    const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(email)}`;
+  //   const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+  //   const resetUrl = `${frontendUrl}/reset-password?token=${encodeURIComponent(email)}`;
 
-    await this.mailService.sendPasswordResetEmail(user.email, user.name, resetUrl);
-  }
+  //   await this.mailService.sendPasswordResetEmail(user.email, user.name, resetUrl);
+  // }
 
-  async resetPassword(dto: ResetPasswordDto): Promise<void> {
-    const { token, newPassword, confirmPassword } = dto;
+  // async resetPassword(dto: ResetPasswordDto): Promise<void> {
+  //   const { token, newPassword, confirmPassword } = dto;
 
-    if (newPassword !== confirmPassword) {
-      throw new BadRequestException('Las contraseñas no coinciden');
-    }
+  //   if (newPassword !== confirmPassword) {
+  //     throw new BadRequestException('Las contraseñas no coinciden');
+  //   }
 
-    const user = await this.usersRepository.findOne({
-      where: { email: token },
-    });
+  //   const user = await this.usersRepository.findOne({
+  //     where: { email: token },
+  //   });
 
-    if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
-    }
+  //   if (!user) {
+  //     throw new NotFoundException('Usuario no encontrado');
+  //   }
 
-    const hashedPassword = await AuthValidations.hashPassword(newPassword);
-    user.password = hashedPassword;
-    await this.usersRepository.save(user);
+  //   const hashedPassword = await AuthValidations.hashPassword(newPassword);
+  //   user.password = hashedPassword;
+  //   await this.usersRepository.save(user);
 
-    await this.mailService.sendPasswordChangedConfirmationEmail(user.email, user.name);
-  }
+  //   await this.mailService.sendPasswordChangedConfirmationEmail(user.email, user.name);
+  // }
 }

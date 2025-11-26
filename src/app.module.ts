@@ -4,7 +4,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeOrmConfig from './config/typeorm';
 import { DataSourceOptions } from 'typeorm';
-import { AuthModule } from './module/auth/auth.module';
+import { UsersModule } from './module/users/users.module';
+import { AuthsModule } from './module/auth/auths.module';
+import { RolesModule } from './module/roles/roles.module';
+import { ReviewModule } from './module/review/review.module';
+import { PropertieImageModule } from './module/propertie_image/propertie_image.module';
+import { PropertieModule } from './module/propertie/propertie.module';
+import { PaymentsModule } from './module/payments/payments.module';
+import { NotificationModule } from './module/notification/notification.module';
+import { KeyHandoverTaskModule } from './module/key_handover_task/key_handover_task.module';
+import { EmployeePropertyAssignmentModule } from './module/employee_property_assignment/employee_property_assignment.module';
+import { EmployeeModule } from './module/employee/employee.module';
+import { CleaningTaskModule } from './module/cleaning_task/cleaning_task.module';
+import { BookingModule } from './module/booking/booking.module';
+import { AvailabilityModule } from './module/availability/availability.module';
 
 @Module({
   imports: [
@@ -22,7 +35,20 @@ import { AuthModule } from './module/auth/auth.module';
         return config;
       },
     }),
-    AuthModule,
+    AuthsModule,
+    UsersModule,
+    RolesModule,
+    ReviewModule,
+    PropertieImageModule,
+    PropertieModule,
+    PaymentsModule,
+    NotificationModule,
+    KeyHandoverTaskModule,
+    EmployeePropertyAssignmentModule,
+    EmployeeModule,
+    CleaningTaskModule,
+    BookingModule,
+    AvailabilityModule,
   ],
   controllers: [],
   providers: [],

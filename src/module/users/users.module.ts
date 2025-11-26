@@ -4,10 +4,9 @@ import { UsersController } from './users.controller';
 import { Users } from './Entyties/users.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthsModule } from '../auth/auths.module';
-import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), forwardRef(() => AuthsModule), MailModule],
+  imports: [TypeOrmModule.forFeature([Users]), forwardRef(() => AuthsModule)],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],
