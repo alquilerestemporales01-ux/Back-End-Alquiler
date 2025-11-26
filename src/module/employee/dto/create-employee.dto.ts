@@ -1,5 +1,5 @@
 import { PickType, ApiProperty, PartialType, OmitType } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Length, Matches } from 'class-validator';
 
 export class CreateEmployeeDto {
   @ApiProperty({
@@ -24,7 +24,7 @@ export class CreateEmployeeDto {
     example: 1234567890,
   })
   @IsOptional()
-  @IsNumber()
+  @IsString()
   phone: string;
 
   @ApiProperty({
@@ -60,8 +60,8 @@ export class CreateEmployeeDto {
   confirmPassword: string;
 
   @ApiProperty({
-    description: 'This field must contain the users name',
-    example: 'Carli',
+    description: 'This field must contain the Employee Role',
+    example: 'KEY_KEEPER',
   })
   @IsNotEmpty()
   @IsString()
